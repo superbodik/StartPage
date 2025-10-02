@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Стартовая страница</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes moveStars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-2000px); }
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .space-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+        }
+
+        .stars-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 200%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 60px 70px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 50px 50px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 10px, #fff, rgba(0,0,0,0));
+            background-repeat: repeat;
+            background-size: 200px 200px;
+            animation: moveStars 100s linear infinite;
+        }
+
+        .planet {
+            position: fixed;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #667eea 0%, #764ba2 100%);
+            opacity: 0.3;
+            filter: blur(40px);
+            animation: glow 4s ease-in-out infinite;
+        }
+
+        .planet-1 {
+            top: -100px;
+            right: -100px;
+        }
+
+        .planet-2 {
+            bottom: -150px;
+            left: -150px;
+            background: radial-gradient(circle at 30% 30%, #f093fb 0%, #f5576c 100%);
+        }
+
+        .settings-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg) scale(1.1);
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: rgba(15, 12, 41, 0.98);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            transition: right 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+        }
+
+        .settings-panel.active {
+            right: 0;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .settings-title {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            font-size: 36px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            line-height: 1;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+        }
+
+        .setting-group {
+            margin-bottom: 30px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 15px;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .setting-input, .setting-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .setting-select {
+            cursor: pointer;
+        }
+
+        .setting-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .setting-input:focus, .setting-select:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+
+        .toggle {
+            position: relative;
+            width: 56px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: rgba(99, 102, 241, 0.6);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: #fff;
+            border-radius: 50%;
+            transition: left 0.3s ease;
+        }
+
+        .toggle.active .toggle-slider {
+            left: 29px;
+        }
+
+        .bookmarks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .bookmark-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .bookmark-item input {
+            flex: 1;
+        }
+
+        .emoji-picker {
+            width: 50px !important;
+            padding: 14px;
+            font-size: 20px;
+            text-align: center;
+            cursor: pointer;
+            flex: none !important;
+        }
+
+        .remove-bookmark {
+            background: rgba(239, 68, 68, 0.3);
+            border: none;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .remove-bookmark:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .add-bookmark-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(99, 102, 241, 0.5);
+            color: #fff;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .add-bookmark-btn:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 50px;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 70px 20px 28px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: #fff;
+            font-size: 17px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(99, 102, 241, 0.6);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: rgba(99, 102, 241, 0.8);
+        }
+
+        .widgets-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+            margin-bottom: 40px;
+        }
+
+        .widget {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 24px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 170px;
+        }
+
+        .widget:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .widget.hidden {
+            display: none;
+        }
+
+        .clock-widget {
+            gap: 8px;
+        }
+
+        .analog-clock {
+            width: 110px;
+            height: 110px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .clock-center {
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 10px;
+        }
+
+        .hour-hand {
+            width: 5px;
+            height: 28px;
+            background: #fff;
+            margin-left: -2.5px;
+        }
+
+        .minute-hand {
+            width: 3px;
+            height: 38px;
+            background: #ddd;
+            margin-left: -1.5px;
+        }
+
+        .second-hand {
+            width: 2px;
+            height: 42px;
+            background: #ff6b6b;
+            margin-left: -1px;
+        }
+
+        .digital-time {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .date-display {
+            font-size: 12px;
+            opacity: 0.6;
+            margin-top: 2px;
+        }
+
+        .city-name {
+            font-size: 13px;
+            opacity: 0.6;
+        }
+
+        .weather-widget {
+            gap: 10px;
+        }
+
+        .weather-icon {
+            font-size: 42px;
+        }
+
+        .temperature {
+            font-size: 36px;
+            font-weight: 200;
+        }
+
+        .weather-description {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        .stocks-widget {
+            gap: 10px;
+        }
+
+        .stock-symbol {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .stock-price {
+            font-size: 32px;
+            font-weight: 300;
+        }
+
+        .stock-change {
+            font-size: 13px;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .stock-change.positive {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .stock-change.negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .night-sky-widget {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, #0a0e27 0%, #1a1f3a 100%);
+        }
+
+        .stars {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        .moon {
+            font-size: 44px;
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5));
+            z-index: 1;
+        }
+
+        .night-text {
+            font-size: 13px;
+            opacity: 0.7;
+            z-index: 1;
+        }
+
+        .bookmarks-container {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .bookmark-link {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .bookmark-link:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .bookmark-icon {
+            font-size: 32px;
+        }
+
+        .bookmark-name {
+            font-size: 13px;
+            opacity: 0.8;
+            word-break: break-word;
+        }
+
+        @media (max-width: 768px) {
+            .widgets-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .bookmarks-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            .settings-panel {
+                padding: 20px;
+            }
+            .settings-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="space-bg">
+        <div class="stars-layer"></div>
+        <div class="planet planet-1"></div>
+        <div class="planet planet-2"></div>
+    </div>
+
+    <div class="settings-btn" id="settingsBtn">⚙️</div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <div class="settings-title">Настройки</div>
+            <div class="close-btn" id="closeBtn">×</div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Поисковая система</label>
+            <select class="setting-select" id="searchEngine">
+                <option value="google">Google</option>
+                <option value="duckduckgo">DuckDuckGo</option>
+                <option value="yandex">Яндекс</option>
+                <option value="bing">Bing</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Ваш город</label>
+            <input type="text" class="setting-input" id="cityName" placeholder="Например: Zeitz или Berlin">
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Символ акций</label>
+            <select class="setting-select" id="stockSymbol">
+                <option value="NVDA">NVIDIA (NVDA)</option>
+                <option value="AAPL">Apple (AAPL)</option>
+                <option value="MSFT">Microsoft (MSFT)</option>
+                <option value="GOOGL">Google (GOOGL)</option>
+                <option value="AMZN">Amazon (AMZN)</option>
+                <option value="TSLA">Tesla (TSLA)</option>
+                <option value="META">Meta (META)</option>
+                <option value="AMD">AMD (AMD)</option>
+            </select>
+        </div>
+
+        <div class="setting-group">
+            <div class="toggle-container">
+                <label class="setting-label" style="margin-bottom: 0;">Показать часы</label>
+                <div class="toggle active" id="toggleClock">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="toggle-container">
+                <label class="setting-label" style="margin-bottom: 0;">Показать погоду</label>
+                <div class="toggle active" id="toggleWeather">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="toggle-container">
+                <label class="setting-label" style="margin-bottom: 0;">Показать акции</label>
+                <div class="toggle active" id="toggleStocks">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <div class="toggle-container">
+                <label class="setting-label" style="margin-bottom: 0;">Показать ночное небо</label>
+                <div class="toggle active" id="toggleSky">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="setting-group">
+            <label class="setting-label">Закладки</label>
+            <div class="bookmarks-list" id="bookmarksList"></div>
+            <button class="add-bookmark-btn" id="addBookmarkBtn">+ Добавить закладку</button>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск в интернете...">
+            <button class="search-btn" id="searchBtn">🔍</button>
+        </div>
+    </div>
+
+    <div class="widgets-container">
+        <div class="widget clock-widget" id="clockWidget">
+            <div class="analog-clock">
+                <div class="hand hour-hand" id="hourHand"></div>
+                <div class="hand minute-hand" id="minuteHand"></div>
+                <div class="hand second-hand" id="secondHand"></div>
+                <div class="clock-center"></div>
+            </div>
+            <div class="digital-time" id="digitalTime">00:00</div>
+            <div class="date-display" id="dateDisplay">Загрузка...</div>
+            <div class="city-name" id="cityDisplay">Zeitz</div>
+        </div>
+
+        <div class="widget weather-widget" id="weatherWidget">
+            <div class="weather-icon" id="weatherIcon">🌡️</div>
+            <div class="temperature" id="temperature">--°C</div>
+            <div class="weather-description" id="weatherDesc">Загрузка...</div>
+        </div>
+
+        <div class="widget stocks-widget" id="stocksWidget">
+            <div class="stock-symbol" id="stockSymbolDisplay">NVDA</div>
+            <div class="stock-price" id="stockPrice">$0.00</div>
+            <div class="stock-change positive" id="stockChange">+0.00%</div>
+        </div>
+
+        <div class="widget night-sky-widget" id="skyWidget">
+            <div class="stars" id="starsContainer"></div>
+            <div class="moon">🌙</div>
+            <div class="night-text">Ясно</div>
+        </div>
+    </div>
+
+    <div class="bookmarks-container" id="bookmarksContainer"></div>
+
+    <script>
+        const config = {
+            weatherUpdateInterval: 600000,
+            stockUpdateInterval: 300000,
+            cities: {
+                'Zeitz': {lat: 51.05, lon: 12.13, tz: 'Europe/Berlin'},
+                'Berlin': {lat: 52.52, lon: 13.41, tz: 'Europe/Berlin'},
+                'Moscow': {lat: 55.75, lon: 37.62, tz: 'Europe/Moscow'},
+                'London': {lat: 51.51, lon: -0.13, tz: 'Europe/London'},
+                'Paris': {lat: 48.85, lon: 2.35, tz: 'Europe/Paris'},
+                'New York': {lat: 40.71, lon: -74.01, tz: 'America/New_York'},
+                'Tokyo': {lat: 35.68, lon: 139.65, tz: 'Asia/Tokyo'},
+                'Dubai': {lat: 25.20, lon: 55.27, tz: 'Asia/Dubai'}
+            },
+            stockData: {
+                'NVDA': {name: 'NVIDIA', basePrice: 135.58},
+                'AAPL': {name: 'Apple', basePrice: 227.79},
+                'MSFT': {name: 'Microsoft', basePrice: 415.26},
+                'GOOGL': {name: 'Google', basePrice: 167.53},
+                'AMZN': {name: 'Amazon', basePrice: 186.38},
+                'TSLA': {name: 'Tesla', basePrice: 352.56},
+                'META': {name: 'Meta', basePrice: 567.32},
+                'AMD': {name: 'AMD', basePrice: 143.11}
+            }
+        };
+
+        const state = {
+            weatherTimer: null,
+            stockTimer: null
+        };
+
+        function init() {
+            loadSettings();
+            updateClock();
+            setInterval(updateClock, 1000);
+            createStars();
+            fetchWeather();
+            updateStockPrice();
+            
+            state.weatherTimer = setInterval(fetchWeather, config.weatherUpdateInterval);
+            state.stockTimer = setInterval(updateStockPrice, config.stockUpdateInterval);
+
+            document.getElementById('settingsBtn').onclick = () => {
+                document.getElementById('settingsPanel').classList.toggle('active');
+            };
+            
+            document.getElementById('closeBtn').onclick = () => {
+                document.getElementById('settingsPanel').classList.remove('active');
+            };
+            
+            document.getElementById('searchBtn').onclick = performSearch;
+            
+            document.getElementById('searchInput').onkeypress = (e) => {
+                if (e.key === 'Enter') performSearch();
+            };
+            
+            document.getElementById('addBookmarkBtn').onclick = addBookmark;
+            document.getElementById('searchEngine').onchange = saveSettings;
+            
+            document.getElementById('cityName').onchange = () => {
+                saveSettings();
+                fetchWeather();
+            };
+            
+            document.getElementById('stockSymbol').onchange = () => {
+                saveSettings();
+                updateStockPrice();
+            };
+            
+            document.getElementById('toggleClock').onclick = () => toggleWidget('clock');
+            document.getElementById('toggleWeather').onclick = () => toggleWidget('weather');
+            document.getElementById('toggleStocks').onclick = () => toggleWidget('stocks');
+            document.getElementById('toggleSky').onclick = () => toggleWidget('sky');
+        }
+
+        function loadSettings() {
+            const searchEngine = localStorage.getItem('searchEngine') || 'google';
+            const cityName = localStorage.getItem('cityName') || 'Zeitz';
+            const stockSymbol = localStorage.getItem('stockSymbol') || 'NVDA';
+
+            document.getElementById('searchEngine').value = searchEngine;
+            document.getElementById('cityName').value = cityName;
+            document.getElementById('stockSymbol').value = stockSymbol;
+            document.getElementById('cityDisplay').textContent = cityName;
+            document.getElementById('stockSymbolDisplay').textContent = stockSymbol;
+
+            ['Clock', 'Weather', 'Stocks', 'Sky'].forEach(widget => {
+                const show = localStorage.getItem(`show${widget}`) !== 'false';
+                const element = document.getElementById(`${widget.toLowerCase()}Widget`);
+                const toggle = document.getElementById(`toggle${widget}`);
+                
+                if (!show) {
+                    element.classList.add('hidden');
+                    toggle.classList.remove('active');
+                }
+            });
+
+            loadBookmarks();
+        }
+
+        function saveSettings() {
+            localStorage.setItem('searchEngine', document.getElementById('searchEngine').value);
+            localStorage.setItem('cityName', document.getElementById('cityName').value);
+            localStorage.setItem('stockSymbol', document.getElementById('stockSymbol').value);
+            document.getElementById('cityDisplay').textContent = document.getElementById('cityName').value;
+            document.getElementById('stockSymbolDisplay').textContent = document.getElementById('stockSymbol').value;
+        }
+
+        function toggleWidget(name) {
+            const widgetId = `${name}Widget`;
+            const toggleId = `toggle${name.charAt(0).toUpperCase() + name.slice(1)}`;
+            const widget = document.getElementById(widgetId);
+            const toggle = document.getElementById(toggleId);
+            
+            widget.classList.toggle('hidden');
+            toggle.classList.toggle('active');
+            
+            const key = `show${name.charAt(0).toUpperCase() + name.slice(1)}`;
+            localStorage.setItem(key, !widget.classList.contains('hidden'));
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            const engines = {
+                google: 'https://www.google.com/search?q=',
+                duckduckgo: 'https://duckduckgo.com/?q=',
+                yandex: 'https://yandex.ru/search/?text=',
+                bing: 'https://www.bing.com/search?q='
+            };
+
+            const engine = document.getElementById('searchEngine').value;
+            window.location.href = engines[engine] + encodeURIComponent(query);
+        }
+
+        function updateClock() {
+            const cityName = document.getElementById('cityName').value;
+            const city = config.cities[cityName] || config.cities['Zeitz'];
+            
+            let now = new Date();
+            if (city.tz) {
+                now = new Date(now.toLocaleString('en-US', {timeZone: city.tz}));
+            }
+
+            const h = now.getHours();
+            const m = now.getMinutes();
+            const s = now.getSeconds();
+
+            const hDeg = (h % 12) * 30 + m * 0.5;
+            const mDeg = m * 6;
+            const sDeg = s * 6;
+
+            document.getElementById('hourHand').style.transform = `rotate(${hDeg}deg)`;
+            document.getElementById('minuteHand').style.transform = `rotate(${mDeg}deg)`;
+            document.getElementById('secondHand').style.transform = `rotate(${sDeg}deg)`;
+
+            const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            document.getElementById('digitalTime').textContent = timeStr;
+
+            const months = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+            const dateStr = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            document.getElementById('dateDisplay').textContent = dateStr;
+        }
+
+        function createStars() {
+            const container = document.getElementById('starsContainer');
+            for (let i = 0; i < 30; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                container.appendChild(star);
+            }
+        }
+
+        async function fetchWeather() {
+            const cityName = document.getElementById('cityName').value;
+            const city = config.cities[cityName];
+            
+            if (!city) {
+                document.getElementById('weatherDesc').textContent = 'Город не найден';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current_weather=true`);
+                const data = await response.json();
+                
+                const temp = Math.round(data.current_weather.temperature);
+                document.getElementById('temperature').textContent = `${temp}°C`;
+                
+                const code = data.current_weather.weathercode;
+                const icons = {
+                    0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️', 
+                    45:'🌫️', 48:'🌫️', 
+                    51:'🌦️', 53:'🌦️', 55:'🌦️',
+                    61:'🌧️', 63:'🌧️', 65:'🌧️',
+                    71:'🌨️', 73:'🌨️', 75:'🌨️',
+                    95:'⛈️'
+                };
+                document.getElementById('weatherIcon').textContent = icons[code] || '🌡️';
+                
+                const descs = {
+                    0:'Ясно', 1:'Ясно', 2:'Облачно', 3:'Пасмурно',
+                    45:'Туман', 48:'Туман',
+                    51:'Морось', 53:'Морось', 55:'Морось',
+                    61:'Дождь', 63:'Дождь', 65:'Дождь',
+                    71:'Снег', 73:'Снег', 75:'Снег',
+                    95:'Гроза'
+                };
+                document.getElementById('weatherDesc').textContent = descs[code] || 'Неизвестно';
+            } catch (error) {
+                console.error('Ошибка погоды:', error);
+                document.getElementById('weatherDesc').textContent = 'Ошибка загрузки';
+            }
+        }
+
+        function updateStockPrice() {
+            const symbol = document.getElementById('stockSymbol').value;
+            const stockInfo = config.stockData[symbol];
+            
+            if (!stockInfo) return;
+
+            const variation = (Math.random() - 0.5) * 0.05;
+            const price = stockInfo.basePrice * (1 + variation);
+            const change = (variation * 100);
+            
+            document.getElementById('stockPrice').textContent = `${price.toFixed(2)}`;
+            
+            const changeElement = document.getElementById('stockChange');
+            const changeText = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+            changeElement.textContent = changeText;
+            changeElement.className = change >= 0 ? 'stock-change positive' : 'stock-change negative';
+            
+            config.stockData[symbol].basePrice = price;
+        }
+
+        function loadBookmarks() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            const list = document.getElementById('bookmarksList');
+            const container = document.getElementById('bookmarksContainer');
+            
+            list.innerHTML = '';
+            container.innerHTML = '';
+
+            bookmarks.forEach((bm, idx) => {
+                const item = document.createElement('div');
+                item.className = 'bookmark-item';
+                
+                const emoji = document.createElement('input');
+                emoji.type = 'text';
+                emoji.className = 'setting-input emoji-picker';
+                emoji.value = bm.icon;
+                emoji.maxLength = 2;
+                emoji.placeholder = '😀';
+                emoji.dataset.idx = idx;
+                emoji.onchange = function() {
+                    updateBookmark(parseInt(this.dataset.idx), 'icon', this.value);
+                };
+                
+                const name = document.createElement('input');
+                name.type = 'text';
+                name.className = 'setting-input';
+                name.placeholder = 'Название';
+                name.value = bm.name;
+                name.dataset.idx = idx;
+                name.onchange = function() {
+                    updateBookmark(parseInt(this.dataset.idx), 'name', this.value);
+                };
+                
+                const url = document.createElement('input');
+                url.type = 'text';
+                url.className = 'setting-input';
+                url.placeholder = 'https://...';
+                url.value = bm.url;
+                url.dataset.idx = idx;
+                url.onchange = function() {
+                    updateBookmark(parseInt(this.dataset.idx), 'url', this.value);
+                };
+                
+                const del = document.createElement('button');
+                del.className = 'remove-bookmark';
+                del.textContent = '×';
+                del.dataset.idx = idx;
+                del.onclick = function() {
+                    removeBookmark(parseInt(this.dataset.idx));
+                };
+                
+                item.appendChild(emoji);
+                item.appendChild(name);
+                item.appendChild(url);
+                item.appendChild(del);
+                list.appendChild(item);
+
+                const link = document.createElement('a');
+                link.className = 'bookmark-link';
+                link.href = bm.url;
+                
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'bookmark-icon';
+                iconDiv.textContent = bm.icon;
+                
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'bookmark-name';
+                nameDiv.textContent = bm.name;
+                
+                link.appendChild(iconDiv);
+                link.appendChild(nameDiv);
+                container.appendChild(link);
+            });
+        }
+
+        function addBookmark() {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            bookmarks.push({name: 'Новая закладка', url: 'https://example.com', icon: '🔖'});
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            loadBookmarks();
+        }
+
+        function removeBookmark(idx) {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            bookmarks.splice(idx, 1);
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            loadBookmarks();
+        }
+
+        function updateBookmark(idx, field, value) {
+            const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+            bookmarks[idx][field] = value;
+            localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+            loadBookmarks();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
